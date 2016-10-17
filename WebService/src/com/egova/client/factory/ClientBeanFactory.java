@@ -5,7 +5,6 @@ import java.net.URL;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.egova.client.dao.impl.ClientManagerImpl;
 import com.egova.client.service.yhdistrict.IEventSynServiceProxy;
 import com.egova.client.service.yhdistrict.IEventSynServiceProxyService;
 import com.egova.webservice.config.SysConfig;
@@ -19,10 +18,26 @@ import com.egova.webservice.config.SysConfig;
 public class ClientBeanFactory {
 	
 	private final static Log logger = LogFactory.getLog(ClientBeanFactory.class);
+	
+	private final static Object monitor = new Object();
+	
+	private static IEventSynServiceProxy webService;
+	
 	/**
 	 * 获取webservice接口
 	 */
 	public static IEventSynServiceProxy getWebService(){
+		if(webService == null) {
+			synchronized(monitor) {
+				if(webService == null) {
+					initIEventSynServiceProxy();
+				}
+			}
+		}
+		return webService;
+	}
+	
+	private static void initIEventSynServiceProxy() {
 		URL url = null;
 		try {
 			url = new URL(SysConfig.MIS_REC_DISPATCH_SERVER);
@@ -31,6 +46,6 @@ public class ClientBeanFactory {
 			e.printStackTrace();
 		}
 		IEventSynServiceProxyService service = new IEventSynServiceProxyService(url);
-		return (IEventSynServiceProxy)service.getIEventSynServiceProxyPort();
+		webService =  (IEventSynServiceProxy)service.getIEventSynServiceProxyPort();
 	}
 }
