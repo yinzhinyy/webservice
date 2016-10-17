@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://service.webservice.egova.com/" name="DistrictRecService" targetNamespace="http://service.webservice.egova.com/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://service.webservice.egova.com/" elementFormDefault="unqualified" targetNamespace="http://service.webservice.egova.com/" version="1.0">
+
+  <xs:element name="feedback" type="tns:feedback"/>
+
+  <xs:element name="feedbackResponse" type="tns:feedbackResponse"/>
+
+  <xs:element name="sspFeedback" type="tns:sspFeedback"/>
+
+  <xs:element name="sspFeedbackResponse" type="tns:sspFeedbackResponse"/>
+
+  <xs:element name="staticQuery" type="tns:staticQuery"/>
+
+  <xs:element name="staticQueryResponse" type="tns:staticQueryResponse"/>
+
+  <xs:complexType name="sspFeedback">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sspFeedbackResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="staticQuery">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="staticQueryResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="feedback">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="feedbackResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="sspFeedbackResponse">
+    <wsdl:part element="ns1:sspFeedbackResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sspFeedback">
+    <wsdl:part element="ns1:sspFeedback" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="staticQuery">
+    <wsdl:part element="ns1:staticQuery" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="staticQueryResponse">
+    <wsdl:part element="ns1:staticQueryResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="feedback">
+    <wsdl:part element="ns1:feedback" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="feedbackResponse">
+    <wsdl:part element="ns1:feedbackResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="DistrictRecService">
+    <wsdl:operation name="sspFeedback">
+      <wsdl:input message="ns1:sspFeedback" name="sspFeedback">
+    </wsdl:input>
+      <wsdl:output message="ns1:sspFeedbackResponse" name="sspFeedbackResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="staticQuery">
+      <wsdl:input message="ns1:staticQuery" name="staticQuery">
+    </wsdl:input>
+      <wsdl:output message="ns1:staticQueryResponse" name="staticQueryResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="feedback">
+      <wsdl:input message="ns1:feedback" name="feedback">
+    </wsdl:input>
+      <wsdl:output message="ns1:feedbackResponse" name="feedbackResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="DistrictRecServiceImplServiceSoapBinding"
+  	type="ns1:DistrictRecService">
+  	<soap:binding style="document"
+  		transport="http://schemas.xmlsoap.org/soap/http" />
+  	<wsdl:operation name="sspFeedback">
+  		<soap:operation soapAction="" style="document" />
+  		<wsdl:input name="sspFeedback">
+  			<soap:body use="literal" />
+  		</wsdl:input>
+  		<wsdl:output name="sspFeedbackResponse">
+  			<soap:body use="literal" />
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="feedback">
+  		<soap:operation soapAction="" style="document" />
+  		<wsdl:input name="feedback">
+  			<soap:body use="literal" />
+  		</wsdl:input>
+  		<wsdl:output name="feedbackResponse">
+  			<soap:body use="literal" />
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="staticQuery">
+  		<soap:operation soapAction="" style="document" />
+  		<wsdl:input name="staticQuery">
+  			<soap:body use="literal" />
+  		</wsdl:input>
+  		<wsdl:output name="staticQueryResponse">
+  			<soap:body use="literal" />
+  		</wsdl:output>
+  	</wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="DistrictRecServiceImplService">
+    <wsdl:port binding="ns1:DistrictRecServiceImplServiceSoapBinding" name="DistrictRecServiceImplPort">
+      <soap:address	location="http://localhost:8080/testWebService/DistrictRecService" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

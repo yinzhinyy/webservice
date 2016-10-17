@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:jaxws="http://cxf.apache.org/jaxws"
+    xmlns:http="http://cxf.apache.org/transports/http/configuration"
+    xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
+    xmlns:sec="http://cxf.apache.org/configuration/security"
+    xmlns:security="http://schemas.iona.com/soa/security-config"
+    xmlns:interop="http://InteropBaseAddress/interop"
+    xmlns:cxf="http://cxf.apache.org/core"
+    xmlns:p="http://cxf.apache.org/policy"
+    xmlns:http-conf = "http://cxf.apache.org/transports/http/configuration"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+    http://cxf.apache.org/jaxws                                     
+    http://cxf.apache.org/schemas/jaxws.xsd
+    http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
+    http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd
+    http://cxf.apache.org/transports/http/configuration             
+    http://cxf.apache.org/schemas/configuration/http-conf.xsd
+    http://cxf.apache.org/transports/http-jetty/configuration       
+    http://cxf.apache.org/schemas/configuration/http-jetty.xsd
+    http://cxf.apache.org/configuration/security                    
+    http://cxf.apache.org/schemas/configuration/security.xsd
+    http://schemas.iona.com/soa/security-config                     
+    http://schemas.iona.com/soa/security-config.xsd">
+ 	
+    
+	<import resource="classpath:META-INF/cxf/cxf.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+	
+	<jaxws:server id="DistrictRecService"
+		serviceClass ="com.egova.webservice.service.DistrictRecService"
+		address="/DistrictRecService" >
+	  <jaxws:serviceBean>  
+         <bean class="com.egova.webservice.service.impl.DistrictRecServiceImpl"/>  
+      </jaxws:serviceBean>  
+    </jaxws:server>
+		
+    <bean id="dispatchJob" class="org.springframework.scheduling.quartz.JobDetailBean">  
+    	<property name="jobClass" value="com.egova.client.timertask.DispatchJob" />  
+    	<property name="applicationContextJobDataKey" value="applicationContext" />
+    </bean> 
+    
+     <bean id="dispatchTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">  
+		<property name="jobDetail" ref="dispatchJob" />  
+		<property name="startDelay" value="10000" /><!-- 调度工厂实例化后，经过10秒开始执行调度 -->  
+		<property name="repeatInterval" value="120000" /><!-- 每2分钟调度一次   -->
+    </bean>  
+    
+    <bean id="collectionJob" class="org.springframework.scheduling.quartz.JobDetailBean">  
+    	<property name="jobClass" value="com.egova.client.timertask.CollectionJob" />  
+    	<property name="applicationContextJobDataKey" value="applicationContext" />
+    </bean> 
+    
+    <bean id="collectionTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">  
+		<property name="jobDetail" ref="collectionJob" />  
+		<property name="startDelay" value="0" /><!-- 调度工厂实例化后，立即执行调度 -->  
+		<property name="repeatInterval" value="120000" /><!-- 每2分钟调度一次   -->
+    </bean>
+    
+    <bean id="reDispatchJob" class="org.springframework.scheduling.quartz.JobDetailBean">  
+    	<property name="jobClass" value="com.egova.client.timertask.ReDispatchJob" />  
+    	<property name="applicationContextJobDataKey" value="applicationContext" />
+    </bean> 
+    
+    <bean id="reDispatchTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">  
+		<property name="jobDetail" ref="reDispatchJob" />  
+		<property name="startDelay" value="0" /><!-- 调度工厂实例化后，立即执行调度 -->  
+		<property name="repeatInterval" value="86400000" /><!-- 每天调度一次   -->
+    </bean>
+    
+    <!--  测试环境，暂不派遣 -->
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">  
+		<property name="triggers">  
+			<list>  
+				<ref bean="dispatchTrigger" /> 
+				<ref bean="collectionTrigger" />
+				<ref bean="reDispatchTrigger" />
+			</list>  
+		</property>  
+	</bean>
+    
+</beans> 

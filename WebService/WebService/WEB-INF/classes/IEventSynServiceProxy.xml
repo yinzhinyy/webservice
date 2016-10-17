@@ -1,0 +1,217 @@
+<?xml version="1.0" ?><wsdl:definitions name="IEventSynServiceProxyService" targetNamespace="http://sjzt.iexchange.proxy.syn.digitalcity.kingdom.com/" xmlns:ns1="http://cxf.apache.org/bindings/xformat" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://sjzt.iexchange.proxy.syn.digitalcity.kingdom.com/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:types>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://sjzt.iexchange.proxy.syn.digitalcity.kingdom.com/" xmlns="http://sjzt.iexchange.proxy.syn.digitalcity.kingdom.com/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:complexType name="sjDistrictStaticDataInfo">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="regionName" type="xs:string"></xs:element>
+            <xs:element minOccurs="0" name="fisrtRecNum" type="xs:string"></xs:element>
+            <xs:element minOccurs="0" name="firstRepeatNum" type="xs:string"></xs:element>
+            <xs:element minOccurs="0" name="firstPointNum" type="xs:string"></xs:element>
+            <xs:element minOccurs="0" name="secondRecNum" type="xs:string"></xs:element>
+            <xs:element minOccurs="0" name="secondRepeatNum" type="xs:string"></xs:element>
+            <xs:element minOccurs="0" name="secondPointNum" type="xs:string"></xs:element>
+            <xs:element minOccurs="0" name="thirdRecNum" type="xs:string"></xs:element>
+            <xs:element minOccurs="0" name="thirdRepeatNum" type="xs:string"></xs:element>
+            <xs:element minOccurs="0" name="thirdPointNum" type="xs:string"></xs:element>
+            <xs:element minOccurs="0" name="totalRecNum" type="xs:string"></xs:element>
+            <xs:element minOccurs="0" name="totalPoint" type="xs:string"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="staticquery" type="staticquery"></xs:element>
+    <xs:complexType name="staticquery">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="startTime" type="xs:dateTime"></xs:element>
+            <xs:element minOccurs="0" name="arg1" type="xs:dateTime"></xs:element>
+            <xs:element name="regionID" type="xs:int"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="staticqueryResponse" type="staticqueryResponse"></xs:element>
+    <xs:complexType name="staticqueryResponse">
+        <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="return" type="sjDistrictStaticDataInfo"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="sspProcess" type="sspProcess"></xs:element>
+    <xs:complexType name="sspProcess">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="requestXML" type="xs:string"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="sspProcessResponse" type="sspProcessResponse"></xs:element>
+    <xs:complexType name="sspProcessResponse">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="return" type="xs:string"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="feedback" type="feedback"></xs:element>
+    <xs:complexType name="feedback">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="eventId" type="xs:string"></xs:element>
+            <xs:element name="sjId" type="xs:int"></xs:element>
+            <xs:element minOccurs="0" name="transOpinion" type="xs:string"></xs:element>
+            <xs:element minOccurs="0" name="transTime" type="xs:dateTime"></xs:element>
+            <xs:element minOccurs="0" name="departmentName" type="xs:string"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="feedbackResponse" type="feedbackResponse"></xs:element>
+    <xs:complexType name="feedbackResponse">
+        <xs:sequence>
+            <xs:element name="return" type="xs:boolean"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="sspfeedback" type="sspfeedback"></xs:element>
+    <xs:complexType name="sspfeedback">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="eventId" type="xs:string"></xs:element>
+            <xs:element name="sjId" type="xs:int"></xs:element>
+            <xs:element minOccurs="0" name="transOpinion" type="xs:string"></xs:element>
+            <xs:element minOccurs="0" name="transTime" type="xs:dateTime"></xs:element>
+            <xs:element minOccurs="0" name="departmentName" type="xs:string"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="sspfeedbackResponse" type="sspfeedbackResponse"></xs:element>
+    <xs:complexType name="sspfeedbackResponse">
+        <xs:sequence>
+            <xs:element name="return" type="xs:boolean"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="process" type="process"></xs:element>
+    <xs:complexType name="process">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="requestXML" type="xs:string"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="processResponse" type="processResponse"></xs:element>
+    <xs:complexType name="processResponse">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="return" type="xs:string"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="sspProcessResponse">
+    <wsdl:part element="tns:sspProcessResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sspfeedbackResponse">
+    <wsdl:part element="tns:sspfeedbackResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sspProcess">
+    <wsdl:part element="tns:sspProcess" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="process">
+    <wsdl:part element="tns:process" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="feedback">
+    <wsdl:part element="tns:feedback" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="processResponse">
+    <wsdl:part element="tns:processResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sspfeedback">
+    <wsdl:part element="tns:sspfeedback" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="feedbackResponse">
+    <wsdl:part element="tns:feedbackResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="staticqueryResponse">
+    <wsdl:part element="tns:staticqueryResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="staticquery">
+    <wsdl:part element="tns:staticquery" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="IEventSynServiceProxy">
+    <wsdl:operation name="staticquery">
+      <wsdl:input message="tns:staticquery" name="staticquery">
+    </wsdl:input>
+      <wsdl:output message="tns:staticqueryResponse" name="staticqueryResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sspProcess">
+      <wsdl:input message="tns:sspProcess" name="sspProcess">
+    </wsdl:input>
+      <wsdl:output message="tns:sspProcessResponse" name="sspProcessResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="feedback">
+      <wsdl:input message="tns:feedback" name="feedback">
+    </wsdl:input>
+      <wsdl:output message="tns:feedbackResponse" name="feedbackResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sspfeedback">
+      <wsdl:input message="tns:sspfeedback" name="sspfeedback">
+    </wsdl:input>
+      <wsdl:output message="tns:sspfeedbackResponse" name="sspfeedbackResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="process">
+      <wsdl:input message="tns:process" name="process">
+    </wsdl:input>
+      <wsdl:output message="tns:processResponse" name="processResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="IEventSynServiceProxyServiceSoapBinding" type="tns:IEventSynServiceProxy">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"></soap:binding>
+    <wsdl:operation name="staticquery">
+      <soap:operation soapAction="" style="document"></soap:operation>
+      <wsdl:input name="staticquery">
+        <soap:body use="literal"></soap:body>
+      </wsdl:input>
+      <wsdl:output name="staticqueryResponse">
+        <soap:body use="literal"></soap:body>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sspProcess">
+      <soap:operation soapAction="" style="document"></soap:operation>
+      <wsdl:input name="sspProcess">
+        <soap:body use="literal"></soap:body>
+      </wsdl:input>
+      <wsdl:output name="sspProcessResponse">
+        <soap:body use="literal"></soap:body>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="feedback">
+      <soap:operation soapAction="" style="document"></soap:operation>
+      <wsdl:input name="feedback">
+        <soap:body use="literal"></soap:body>
+      </wsdl:input>
+      <wsdl:output name="feedbackResponse">
+        <soap:body use="literal"></soap:body>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sspfeedback">
+      <soap:operation soapAction="" style="document"></soap:operation>
+      <wsdl:input name="sspfeedback">
+        <soap:body use="literal"></soap:body>
+      </wsdl:input>
+      <wsdl:output name="sspfeedbackResponse">
+        <soap:body use="literal"></soap:body>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="process">
+      <soap:operation soapAction="" style="document"></soap:operation>
+      <wsdl:input name="process">
+        <soap:body use="literal"></soap:body>
+      </wsdl:input>
+      <wsdl:output name="processResponse">
+        <soap:body use="literal"></soap:body>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="IEventSynServiceProxyService">
+    <wsdl:port binding="tns:IEventSynServiceProxyServiceSoapBinding" name="IEventSynServiceProxyPort">
+      <soap:address location="http://192.168.1.112:7070/KDSYNServer/IEventSynServiceProxy"></soap:address>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
