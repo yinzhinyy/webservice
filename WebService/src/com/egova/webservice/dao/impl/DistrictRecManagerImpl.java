@@ -40,16 +40,16 @@ public class DistrictRecManagerImpl implements DistrictRecManager {
 //		Date convertedTransTime = DateUtils.strToFormatDate(transTime, "yyyy-MM-dd HH:mm:ss");//TODO
 		try {
 			jdbcTemplate.update(sql, new Object[]{ transOpinion, transTime, departmentName, new Integer(recID) }, 
-														new int[]{ Types.VARCHAR, Types.DATE, Types.VARCHAR, Types.INTEGER });
+														new int[]{ Types.VARCHAR, Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER });
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
 	public void updateDistrictDepartment(int recID, String departmentName) {
-		String sql = "update dlmis.torecact set rolepartid = ( CASE WHEN (SELECT roleid FROM dlsys.tcrole WHERE rolename='" + departmentName + "')"
-						+ " IS NOT NULL THEN (SELECT roleid FROM dlsys.tcrole WHERE rolename='" + departmentName + "')" +" ELSE 66 END ),"//66为雨花区专业部门unitID
-						+ " rolepartname='" + departmentName + "' where recid=? and actdefid=57";//57为雨花区专业部门actdefID
+		String sql = "update dlmis.torecact set rolepartid = ( CASE WHEN (SELECT unitid FROM dlsys.tcunit WHERE unitname='" + departmentName + "')"
+						+ " IS NOT NULL THEN (SELECT unitid FROM dlsys.tcunit WHERE unitname='" + departmentName + "')" +" ELSE 66 END ),"//66为雨花区专业部门unitID
+						+ " unitname='" + departmentName + "' where recid=? and actdefid=57";//57为雨花区专业部门actdefID
 		try {
 			jdbcTemplate.update(sql, recID);
 		} catch(Exception e) {
