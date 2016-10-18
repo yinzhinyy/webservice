@@ -82,15 +82,10 @@ public class ClientServiceImpl implements ClientService {
 						isSuccess = result.getErrorCode();
 						errorDesc = result.getErrorDesc();
 					}
+					//保存接口报文
+					clientManager.saveXmlContent(recID, recTypeName, "调用雨花区派遣接口", isSuccess, requestXml, responseXml, errorDesc);
 				} else {
 					clientManager.updateRecNotDispatched(recID);
-				}
-				//保存接口报文
-				try{
-					clientManager.saveXmlContent(recID, recTypeName, "调用雨花区派遣接口", isSuccess, requestXml, responseXml, errorDesc);
-				}catch(Exception e){
-					logger.error("保存区级平台派遣接口调用报文出错！", e);
-					e.printStackTrace();
 				}
 			}
 		}
