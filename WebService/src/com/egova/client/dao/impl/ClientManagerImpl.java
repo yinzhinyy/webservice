@@ -330,7 +330,8 @@ public class ClientManagerImpl implements ClientManager {
 
 	public void collect() {
 		String sSql = "select recid from dlmis.torecact"
-							+ " where actdefid=57 and ( partid=4487 or rolepartid=4488)"
+							+ " where actdefid=57 and ( partid=" + SysConfig.MIS_REC_AUTOASSIGN_HUMANID
+							+ " or rolepartid = ( select roleid from dlsys.tchumanrole where humanid=" + SysConfig.MIS_REC_AUTOASSIGN_HUMANID + ") )"
 							+ " and recid not in ( select recid from dlmis.torecdispatch )";
 		List<Integer> recs = (List<Integer>)jdbcTemplate.query(sSql, new DAORowMapper<Integer>(Integer.class));
 		if(null == recs || recs.size() < 1) {

@@ -47,9 +47,11 @@ public class DistrictRecManagerImpl implements DistrictRecManager {
 	}
 	
 	public void updateDistrictDepartment(int recID, String departmentName) {
-		String sql = "update dlmis.torecact set rolepartid = ( CASE WHEN (SELECT unitid FROM dlsys.tcunit WHERE unitname='" + departmentName + "')"
-						+ " IS NOT NULL THEN (SELECT unitid FROM dlsys.tcunit WHERE unitname='" + departmentName + "')" +" ELSE 66 END ),"//66为雨花区专业部门unitID
-						+ " unitname='" + departmentName + "' where recid=? and actdefid=57";//57为雨花区专业部门actdefID
+		String sql = "update dlmis.torecact t set t.partid=" + SysConfig.MIS_REC_AUTOASSIGN_HUMANID
+						+ ", t.partname = ( select humanname from dlsys.tchuman where humanid=" + SysConfig.MIS_REC_AUTOASSIGN_HUMANID + ")"
+						+ ", t.unitid = ( CASE WHEN (SELECT unitid FROM dlsys.tcunit WHERE unitname='" + departmentName + "')"
+						+ " IS NOT NULL THEN (SELECT unitid FROM dlsys.tcunit WHERE unitname='" + departmentName + "')" +" ELSE 66 END )"//66为雨花区专业部门unitID
+						+ ", t.unitname='" + departmentName + "' where t.recid=? and t.actdefid=57";//57为雨花区专业部门actdefID
 		try {
 			jdbcTemplate.update(sql, recID);
 		} catch(Exception e) {
@@ -97,14 +99,14 @@ public class DistrictRecManagerImpl implements DistrictRecManager {
 		int humanID = 23;//管理员humanid
 		int queryID = 1168;//1168为2016年区域考评表queryID
 		String statTimeStr = "";//默认为空
-	    String whereSQL = "where 1=1";
+	    String whereSQL = "where districtid not in (7,8) and hungnum <> 1";
 	    if(null != startTime) {
 	    	String startTimeStr = DateUtils.dateTimeToStr(startTime);
 	    	whereSQL += " and createtime >= to_date('" + startTimeStr + "','yyyy-mm-dd hh24:mi:ss')";
 	    }
 	    if(null != endTime) {
 	    	String endTimeStr = DateUtils.dateTimeToStr(endTime);
-	    	whereSQL += " and createtime <= to_date('" + endTimeStr + "','yyyy-mm-dd hh24:mi:ss')";
+	    	whereSQL += " and createtime <= to_date('" + endTimeStr + "','yyyy-mm-dd hh24:mi:ss')" ;
 	    }
 	    Map<String, Object> map = new HashMap<String, Object>();
 		try {

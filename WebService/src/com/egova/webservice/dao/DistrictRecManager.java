@@ -37,7 +37,7 @@ public interface DistrictRecManager {
 	public List<RegionStatEval> staticQuery(Date startTime, Date endTime, int regionID);
 
 	/**
-	 * 更新案卷区级平台处理部门（rolepartname&rolepartid）
+	 * 更新案卷区级平台处理部门（unitid&unitname，同时更新partid&partname为虚拟节点）
 	 * @param recID
 	 * @param departmentName
 	 */
