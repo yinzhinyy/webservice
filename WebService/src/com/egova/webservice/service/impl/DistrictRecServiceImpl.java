@@ -6,7 +6,6 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.egova.client.bean.DispatchRec;
@@ -46,7 +45,7 @@ public class DistrictRecServiceImpl implements DistrictRecService{
 		FeedbackRequest request = XmlParser.convertToJavaBean(requestXML, FeedbackRequest.class);
 		int errorCode = -1;
 		String errorDesc = "";
-		if(null == request){
+		if(request == null){
 			errorDesc = "传入参数有误，请确认格式是否正确！";
 		} else if(!hasDepartmentName(request)) {
 			errorDesc = "处理部门名称不能为空！";
@@ -54,20 +53,16 @@ public class DistrictRecServiceImpl implements DistrictRecService{
 			//判断是否已连上数据库
 			try {
 				int recID = request.getRecID();
-				DispatchRec dRec = null;
-				dRec = districtRecManager.getDispatchedRec(recID).get(0);
-				if(!isDispatchedRec(dRec)) {
+				List<DispatchRec> dRecs = districtRecManager.getDispatchedRec(recID);
+				if(!isDispatchedRec(dRecs)) {
 					errorDesc = "在已派遣问题中找不到该问题recID！";
 				} else {
-					String transOpinion = request.getTransOpinion();
-					Date transTime = request.getTransTime() == null ? new Date() : request.getTransTime();
-					String departmentName = request.getDepartmentName();
-					//更新问题反馈结果
+					DispatchRec dRec = dRecs.get(0);
 					try {
-						districtRecManager.updateRecTransitInfo(recID, transOpinion, transTime, departmentName);
-						//更新问题区级平台专业部门，对成功与否不做判断
-						districtRecManager.updateDistrictDepartment(recID, departmentName);
-						ResultInfo result = new ResultInfo(true);
+						//更新问题反馈结果
+						districtRecManager.updateRecTransitInfo(request);
+						//实现自动办理
+						ResultInfo result = districtRecManager.assign(request);
 						//随手拍上报案卷执行批转
 						if(isSspPatrolRec(dRec)) {
 							result = districtRecManager.transit(request);
@@ -97,12 +92,12 @@ public class DistrictRecServiceImpl implements DistrictRecService{
 		return responseXml;
 	}
 
-	private boolean isDispatchedRec(DispatchRec dRec) {
-		return null != dRec;
+	private boolean isDispatchedRec(List<DispatchRec> dRecs) {
+		return dRecs != null && dRecs.size() > 0;
 	}
 
 	private boolean isSspPatrolRec(DispatchRec dRec) {
-		return "市民随手拍".equals(dRec.getRecTypeName()) && null != dRec.getPatrolName();
+		return "市民随手拍".equals(dRec.getRecTypeName()) && dRec.getPatrolName() != null;
 	}
 	
 	private boolean hasDepartmentName(FeedbackRequest request) {
@@ -121,7 +116,7 @@ public class DistrictRecServiceImpl implements DistrictRecService{
 		List<RegionStatEval> list = null;
 		int errorCode = -1;
 		String errorDesc = "";
-		if(null == request){
+		if(request == null){
 			errorDesc = "传入参数有误，请确认格式是否正确！";
 		} else {
 			//判断是否已连上数据库

@@ -22,13 +22,13 @@ public class DistrictRecServiceTest {
 		service.feedback(xml);
 	}
 	
-//	@Test
+	@Test
 	public void testSspFeedBack() {
 		String xml = getRequestXML();
 		service.sspFeedback(xml);
 	}
 	
-	@Test
+//	@Test
 	public void testStaticQuery() {
 		String xml = getQueryXML();
 		service.staticQuery(xml);
@@ -45,13 +45,13 @@ public class DistrictRecServiceTest {
 	}
 
 	private String getRequestXML() {
-		int recID = 2534610;
+		int recID = 2534615;
 		String xml = "<?xml version='1.0' encoding='UTF-8' ?>";
 		xml += "<request>" 
 				+ "<recID>" + recID + "</recID>"
 				+ "<transOpinion>" + "请审核！" + "</transOpinion>"
 		        + "<transTime>" + "2016-09-23T16:46:16.936+08:00" + "</transTime>"
-		        + "<departmentName>" + "砂子塘街道" + "</departmentName>"
+		        + "<departmentName>" + "洞井街道" + "</departmentName>"
 		        + "</request>";
 		return xml;
 	}

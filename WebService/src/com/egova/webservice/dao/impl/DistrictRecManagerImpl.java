@@ -21,6 +21,7 @@ import com.egova.webservice.bean.RegionStatEval;
 import com.egova.webservice.common.ResultInfo;
 import com.egova.webservice.config.SysConfig;
 import com.egova.webservice.dao.DistrictRecManager;
+import com.egova.webservice.dao.procedure.FoWFActAutoAssign;
 import com.egova.webservice.dao.procedure.FoWFActTransit;
 import com.egova.webservice.dao.procedure.PoConfiguredStat;
 import com.egova.webservice.dao.procedure.bean.WFActTransit;
@@ -35,7 +36,11 @@ public class DistrictRecManagerImpl implements DistrictRecManager {
 	@Autowired 
 	JdbcTemplate jdbcTemplate;
 	
-	public void updateRecTransitInfo(int recID, String transOpinion, Date transTime, String departmentName) {
+	public void updateRecTransitInfo(FeedbackRequest request) {
+		int recID = request.getRecID();
+		String transOpinion = request.getTransOpinion();
+		Date transTime = request.getTransTime() == null ? new Date() : request.getTransTime();
+		String departmentName = request.getDepartmentName();
 		String sql = "update dlmis.torecdispatch set transopinion=?, transtime=?, departmentname=? where recid=?";
 //		Date convertedTransTime = DateUtils.strToFormatDate(transTime, "yyyy-MM-dd HH:mm:ss");//TODO
 		try {
@@ -46,22 +51,52 @@ public class DistrictRecManagerImpl implements DistrictRecManager {
 		}
 	}
 	
-	public void updateDistrictDepartment(int recID, String departmentName) {
-		String sql = "update dlmis.torecact t set t.partid=" + SysConfig.MIS_REC_AUTOASSIGN_HUMANID
-						+ ", t.partname = ( select humanname from dlsys.tchuman where humanid=" + SysConfig.MIS_REC_AUTOASSIGN_HUMANID + ")"
-						+ ", t.unitid = ( CASE WHEN (SELECT unitid FROM dlsys.tcunit WHERE unitname='" + departmentName + "')"
-						+ " IS NOT NULL THEN (SELECT unitid FROM dlsys.tcunit WHERE unitname='" + departmentName + "')" +" ELSE 66 END )"//66为雨花区专业部门unitID
-						+ ", t.unitname='" + departmentName + "' where t.recid=? and t.actdefid=57";//57为雨花区专业部门actdefID
+	public ResultInfo assign(FeedbackRequest request)  {
+		int recID = request.getRecID();
+		String departmentName = request.getDepartmentName();
+		ResultInfo result = new ResultInfo(false);
 		try {
-			jdbcTemplate.update(sql, recID);
-		} catch(Exception e) {
+			//获取当前处理部门下人员
+			String hSql = "SELECT a.humanid FROM dlsys.tchuman a, dlsys.tcunit b WHERE a.unitid=b.unitid"
+					+ " AND ( b.unitid=66 OR b.seniorid=66 OR b.seniorid IN ( SELECT unitid FROM dlsys.tcunit WHERE seniorid=66))"
+					+ " AND b.unitname = ? AND ROWNUM=1";//66为雨花区专业部门
+			int humanID = jdbcTemplate.queryForInt(hSql, departmentName);
+			//获取当前活动的actID
+			String aSql = "select actid from (select t.actid from dlmis.torecact t where t.actdefid = 57 and t.recid = ?  order by t.createtime desc) where rownum = 1";
+			int actID = jdbcTemplate.queryForInt(aSql, recID);//57为雨花区专业部门actdefID
+			if(actID > 0){
+				//获取当前处理部门ID，并于RECACT更新
+				String rSql = "select roleid from dlsys.tcrole where rolename=?";
+				int roleID = jdbcTemplate.queryForInt(rSql, departmentName);
+				if(roleID > 0 && humanID >0) {
+					String uSql = "UPDATE dlmis.torecact SET partid=0, rolepartid=?, rolepartname=? where actid=?";
+					jdbcTemplate.update(uSql, roleID, departmentName, actID);
+				} else {
+					humanID = SysConfig.MIS_REC_AUTOASSIGN_HUMANID;
+				}
+				result = this.doAssign(humanID, actID, "assign"); 
+			}
+		} catch (Exception e) {
+			result.setMessage("案卷办理失败！");
 			e.printStackTrace();
 		}
+		return result;
 	}
 	
-	public ResultInfo transit(FeedbackRequest feedbackRequest){
+	private ResultInfo doAssign(int humanID, int actID, String itemType){
+		try{
+			FoWFActAutoAssign fo = new FoWFActAutoAssign(jdbcTemplate);
+		    return fo.execute(humanID, actID, itemType);
+		}catch(Exception e){
+			logger.error("案卷办理存过出错！", e);
+			e.printStackTrace();
+		}
+		return new ResultInfo(false);
+	}
+	
+	public ResultInfo transit(FeedbackRequest request){
 		int actID = 0;
-		int recID = feedbackRequest.getRecID();
+		int recID = request.getRecID();
 		ResultInfo result = new ResultInfo(false);
 		try{
 			//获取当前活动的actID
@@ -73,7 +108,7 @@ public class DistrictRecManagerImpl implements DistrictRecManager {
 				wTransit.setHumanID(SysConfig.MIS_REC_AUTOASSIGN_HUMANID);
 				wTransit.setItemType("transit");
 				wTransit.setTransInfo("52,15,1");//52为监督中心（核查）actdefID，15为接线员roleID
-				wTransit.setTransMemo(feedbackRequest.getTransOpinion());
+				wTransit.setTransMemo(request.getTransOpinion());
 				//执行批转操作
 				result = this.doTransit(wTransit);
 			}

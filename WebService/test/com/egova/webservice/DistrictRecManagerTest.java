@@ -27,16 +27,12 @@ public class DistrictRecManagerTest {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	
-//	@Test
-	public void testUpdateDepartment() {
-		manager.updateDistrictDepartment(2535115, "高桥街道");
-	}
-	
-//	@Test
+	@Test
 	public void testTransit() {
 		String xml = getRequestXML();
 		FeedbackRequest request = XmlParser.convertToJavaBean(xml, FeedbackRequest.class);
-		ResultInfo result = manager.transit(request);
+		ResultInfo result = manager.assign(request);
+		result = manager.transit(request);
 		System.out.println(result.getMessage());
 		System.out.println(result.getData());
 	}
@@ -59,13 +55,13 @@ public class DistrictRecManagerTest {
 	}
 	
 	private String getRequestXML() {
-		int recID = 2232364;
+		int recID = 2534613;
 		String xml = "<?xml version='1.0' encoding='UTF-8' ?>";
 		xml += "<request>" 
 				+ "<recID>" + recID + "</recID>"
 				+ "<transOpinion>" + "just for test" + "</transOpinion>"
 		        + "<transTime>" + "2016-09-13T16:53:01.401+08:00" + "</transTime>"
-		        + "<departmentName>" + "department" + "</departmentName>"
+		        + "<departmentName>" + "洞井街道" + "</departmentName>"
 		        + "</request>";
 		return xml;
 	}

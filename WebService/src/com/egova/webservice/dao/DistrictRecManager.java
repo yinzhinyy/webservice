@@ -16,9 +16,16 @@ import com.egova.webservice.common.ResultInfo;
 public interface DistrictRecManager {
 	/**
 	 * 区级平台调用反馈接口后更新torecdispatch表中批转信息
-	 * @param recID
+	 * @param feedbackRequest
 	 */
-	public void updateRecTransitInfo(int recID, String transOpinion, Date transTime, String departmentName);
+	public void updateRecTransitInfo(FeedbackRequest feedbackRequest);
+	
+	/**
+	 * 实现自动办理
+	 * @param feedbackRequest
+	 * @return
+	 */
+	public ResultInfo assign(FeedbackRequest feedbackRequest);
 	
 	/**
 	 * 区级平台案卷批转
@@ -35,13 +42,6 @@ public interface DistrictRecManager {
 	 * @return
 	 */
 	public List<RegionStatEval> staticQuery(Date startTime, Date endTime, int regionID);
-
-	/**
-	 * 更新案卷区级平台处理部门（unitid&unitname，同时更新partid&partname为虚拟节点）
-	 * @param recID
-	 * @param departmentName
-	 */
-	public void updateDistrictDepartment(int recID, String departmentName);
 
 	/**
 	 * 根据recID从dlmis.torecdispatch获取已派遣案卷信息
