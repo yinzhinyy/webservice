@@ -54,6 +54,7 @@ public class DistrictRecManagerImpl implements DistrictRecManager {
 	public ResultInfo assign(FeedbackRequest request)  {
 		int recID = request.getRecID();
 		String departmentName = request.getDepartmentName();
+		String transOpinion = request.getTransOpinion();
 		ResultInfo result = new ResultInfo(false);
 		try {
 			//获取当前处理部门下人员
@@ -69,8 +70,8 @@ public class DistrictRecManagerImpl implements DistrictRecManager {
 				String rSql = "select roleid from dlsys.tcrole where rolename=?";
 				int roleID = jdbcTemplate.queryForInt(rSql, departmentName);
 				if(roleID > 0 && humanID >0) {
-					String uSql = "UPDATE dlmis.torecact SET partid=0, rolepartid=?, rolepartname=? where actid=?";
-					jdbcTemplate.update(uSql, roleID, departmentName, actID);
+					String uSql = "UPDATE dlmis.torecact SET partid=0, rolepartid=?, rolepartname=?, transopinion=? where actid=?";
+					jdbcTemplate.update(uSql, roleID, departmentName, transOpinion, actID);
 				} else {
 					humanID = SysConfig.MIS_REC_AUTOASSIGN_HUMANID;
 				}
