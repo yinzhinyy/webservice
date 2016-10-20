@@ -24,7 +24,7 @@ public interface ClientManager {
 	public void updateRecDispatched(int recID);
 	
 	/**
-	 * 未派遣成功时，派遣次数+1
+	 * 未派遣成功时，派遣次数+1，派遣状态改为未派遣
 	 * @param recID
 	 */
 	public void updateRecNotDispatched(int recID);

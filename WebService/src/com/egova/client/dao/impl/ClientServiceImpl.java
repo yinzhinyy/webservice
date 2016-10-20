@@ -42,13 +42,14 @@ public class ClientServiceImpl implements ClientService {
 			String errorDesc = null;
 			Set<Entry<Integer, String>> entrySet = xmlMap.entrySet();
 			for(Entry<Integer,String> entry : entrySet){
-				int isSuccess = 0;
 				int recID = entry.getKey();
 				String responseXml = "";
 				String requestXml = entry.getValue();
 				logger.info("requestXML: " + requestXml);
 				String recTypeName = getRecTypeName(requestXml);
 				try {
+					//预先将派遣状态改为已派遣，以免重复派遣；报错时抛给调用域，由其修改为未派遣状态
+					clientManager.updateRecDispatched(recID);
 					IEventSynServiceProxy webService = ClientBeanFactory.getWebService();
 					if(webService != null){
 						//派遣接口调用，分普通案卷和随手拍两种情况
@@ -72,11 +73,9 @@ public class ClientServiceImpl implements ClientService {
 					e.printStackTrace();
 				}
 				logger.info("responseXML: " + responseXml);
-				//派遣成功后修改案卷派遣状态
+				int isSuccess = 0;
 				FeedbackResponse feedback = XmlParser.convertToJavaBean(responseXml, FeedbackResponse.class);
 				if(feedback != null){
-					//如果报错，则终止服务，以免重复派遣
-					clientManager.updateRecDispatched(recID);
 					CommonResult result = feedback.getCommonResult();
 					if(result != null) {
 						isSuccess = result.getErrorCode();

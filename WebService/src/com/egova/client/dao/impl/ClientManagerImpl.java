@@ -124,7 +124,7 @@ public class ClientManagerImpl implements ClientManager {
 	}
 	
 	public void updateRecNotDispatched(int recID) {
-		String sql = "update dlmis.torecdispatch set dispatchcount=dispatchcount+1 where recid = ?";
+		String sql = "update dlmis.torecdispatch set dispatched = 0, dispatchcount=dispatchcount+1 where recid = ?";
 		try{
 			jdbcTemplate.update(sql, recID);
 		}catch(Exception e){
