@@ -39,7 +39,6 @@ public class ClientServiceImpl implements ClientService {
 		if(xmlMap == null|| xmlMap.size() < 1){
 			logger.info("暂无需下发至雨花区平台的问题！");
 		} else {
-			String errorDesc = null;
 			Set<Entry<Integer, String>> entrySet = xmlMap.entrySet();
 			for(Entry<Integer,String> entry : entrySet){
 				int recID = entry.getKey();
@@ -68,23 +67,24 @@ public class ClientServiceImpl implements ClientService {
 					YHHttpClient client = HttpClientFactory.getHttpClient();
 					responseXml  = client.process(methodName, requestXml);*/
 				} catch (Exception e) {
-					clientManager.updateRecNotDispatched(recID);
 					logger.error("区级平台接口无法连接！", e);
 					e.printStackTrace();
 				}
 				logger.info("responseXML: " + responseXml);
-				int isSuccess = 0;
 				FeedbackResponse feedback = XmlParser.convertToJavaBean(responseXml, FeedbackResponse.class);
-				if(feedback != null){
+				if(feedback == null){
+					clientManager.updateRecNotDispatched(recID);
+					logger.error("无法解析反馈消息！");
+				} else {
 					CommonResult result = feedback.getCommonResult();
+					int isSuccess = 0;
+					String errorDesc = null;
 					if(result != null) {
 						isSuccess = result.getErrorCode();
 						errorDesc = result.getErrorDesc();
 					}
 					//保存接口报文
 					clientManager.saveXmlContent(recID, recTypeName, "调用雨花区派遣接口", isSuccess, requestXml, responseXml, errorDesc);
-				} else {
-					clientManager.updateRecNotDispatched(recID);
 				}
 			}
 		}

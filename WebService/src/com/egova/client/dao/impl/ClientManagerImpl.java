@@ -115,7 +115,7 @@ public class ClientManagerImpl implements ClientManager {
 	}
 	
 	public void updateRecDispatched(int recID){
-		String sql = "update dlmis.torecdispatch set dispatched = 1, dispatchcount=dispatchcount+1, successtime = sysdate where recid = ?";
+		String sql = "update dlmis.torecdispatch set dispatched = 1, successtime = sysdate where recid = ?";
 		try{
 			jdbcTemplate.update(sql, recID);
 		}catch(Exception e){
@@ -124,7 +124,7 @@ public class ClientManagerImpl implements ClientManager {
 	}
 	
 	public void updateRecNotDispatched(int recID) {
-		String sql = "update dlmis.torecdispatch set dispatched = 0, dispatchcount=dispatchcount+1 where recid = ?";
+		String sql = "update dlmis.torecdispatch set dispatched = 0, dispatchcount=dispatchcount+1, successtime = null where recid = ?";
 		try{
 			jdbcTemplate.update(sql, recID);
 		}catch(Exception e){
