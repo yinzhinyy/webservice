@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.egova.client.bean.DispatchRec;
@@ -64,7 +65,7 @@ public class DistrictRecServiceImpl implements DistrictRecService{
 						//实现自动办理
 						ResultInfo result = districtRecManager.assign(request);
 						//随手拍上报案卷执行批转
-						if(isSspPatrolRec(dRec)) {
+						if(result.isSuccess() && isSspPatrolRec(dRec)) {
 							result = districtRecManager.transit(request);
 						}
 						if(result.isSuccess()) {

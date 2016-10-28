@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.egova.client.bean.DispatchRec;
 import com.egova.client.bean.MediaPath;
@@ -56,7 +57,7 @@ public class ClientManagerImpl implements ClientManager {
 		String sql = "select * from dlmis.torecdispatch t where t.dispatched = 0 and t.dispatchcount < ?";
 		try{
 			List<DispatchRec> list = jdbcTemplate.query(sql, new Object[]{dispatchLimit} ,new DAORowMapper<DispatchRec>(DispatchRec.class));
-			if(null != list && list.size() > 0){
+			if(list != null && list.size() > 0){
 				int len = list.size();
 				Map<Integer,String> xmlList = new HashMap<Integer,String>();
 				for(int i = 0;i < len;i ++){
@@ -158,10 +159,10 @@ public class ClientManagerImpl implements ClientManager {
 			String sql = "select t.msgid,t.mediaid,t.mediapath,t.medianame from dlmis.torecmedia t where t.recid = "+recID+
 					" and t.mediausage = '"+mediaUsage+"' and t.mediatype = 'IMAGE'";
 			List<MediaPath> list = jdbcTemplate.query(sql, new DAORowMapper<MediaPath>(MediaPath.class));
-			if(null == list || list.size() < 1){
+			if(list == null || list.size() < 1){
 				System.out.println("图片数据为空");
 			}
-			if(null != list && list.size() > 0){
+			if(list != null && list.size() > 0){
 				String attachment ="<attachment>";
 				for(int i = 0,len = list.size();i < len ;i++){
 					attachment +="<item>";
@@ -170,11 +171,11 @@ public class ClientManagerImpl implements ClientManager {
 					SmbFile file = new SmbFile(filePath);
 					String mediaName = media.getMediaName();
 					String suffixName = "jpg";
-					if(null != mediaName && mediaName.length() > 0){
+					if(mediaName != null && mediaName.length() > 0){
 						int index = mediaName.lastIndexOf(".");
 						suffixName = mediaName.substring(index);
 					}
-					if(null != file && file.exists()){
+					if(file != null && file.exists()){
 						file.connect();
 						byte[] buffer = new byte[file.getContentLength()];
 						SmbFileInputStream sfis = new SmbFileInputStream(file);
@@ -199,26 +200,49 @@ public class ClientManagerImpl implements ClientManager {
 		//查询案卷对应类型的上报图片
 		String sql = "select t.msgid,t.mediaid,t.mediapath,t.medianame from dlmis.torecmedia t where t.recid = "+recID+
 				" and t.mediausage = '"+mediaUsage+"' and t.mediatype = 'IMAGE'";
+		//查询dlmis.towfrecactattach表对应附件
+		String aSql = "select attachpath from dlmis.towfrecactattach where recid = " + recID;
 		try {
 			List<MediaPath> list = jdbcTemplate.query(sql, new DAORowMapper<MediaPath>(MediaPath.class));
-			if(null == list || list.size() < 1){
-				System.out.println("图片数据为空");
-			}
-			if(null != list && list.size() > 0){
+			List<String> attachList = jdbcTemplate.query(aSql, new DAORowMapper<String>(String.class));
+			if((list == null || list.size() < 1) && (attachList == null || attachList.size() < 1)){
+				logger.info("没有上传多媒体数据");
+			} else {
 				String attachment ="<attachment>";
-				for(int i = 0,len = list.size();i < len ;i++){
-					attachment +="<item>";
-					MediaPath media = (MediaPath)list.get(i);
-					String virtualDir = SysConfig.COMMON_URL_VIRTUALDIR;
-					virtualDir = virtualDir.endsWith("/") ? virtualDir.substring(0, virtualDir.length()-1) : virtualDir;
-					String url = virtualDir + "/" + media.getMediaPath()+"/"+media.getMsgID()+"_"+media.getMediaID()+"_"+media.getMediaName();
-					String mediaName = media.getMediaName();
-					String suffixName = "jpg";
-					if(null != mediaName && mediaName.length() > 0){
-						int index = mediaName.lastIndexOf(".") + 1;
-						suffixName = mediaName.substring(index);
+				String virtualDir = SysConfig.COMMON_URL_VIRTUALDIR;
+				virtualDir = virtualDir.endsWith("/") ? virtualDir.substring(0, virtualDir.length()-1) : virtualDir;
+				if(list != null) {
+					for(int i = 0,len = list.size();i < len ;i++){
+						attachment +="<item>";
+						MediaPath media = (MediaPath)list.get(i);
+						String relativePath = media.getMediaPath();
+						relativePath = relativePath.endsWith("/") ? relativePath.substring(0, relativePath.length()-1) : relativePath;
+						String url = virtualDir + "/" + relativePath + "/" + media.getMsgID()+"_"+media.getMediaID()+"_"+media.getMediaName();
+						String mediaName = media.getMediaName();
+						String suffixName = "jpg";
+						if(mediaName != null && mediaName.length() > 0){
+							int index = mediaName.lastIndexOf(".") + 1;
+							suffixName = mediaName.substring(index);
+						}
+						attachment += "<content>"+url+"</content><type>"+suffixName+"</type><fileName>"+mediaName+"</fileName></item>";
 					}
-					attachment += "<content>"+url+"</content><type>"+suffixName+"</type><fileName>"+mediaName+"</fileName></item>";
+				}
+				if(attachList != null) {
+					for(int i = 0,len = attachList.size();i < len ;i++){
+						String relativeUrl = attachList.get(i);
+						String url = virtualDir + "/" + relativeUrl;
+						String mediaName = null;
+						if(relativeUrl != null && relativeUrl.length() > 0) {
+							int index = relativeUrl.lastIndexOf("/") + 1;
+							mediaName = relativeUrl.substring(index);
+						}
+						String suffixName = "jpg";
+						if(mediaName != null && mediaName.length() > 0){
+							int index = mediaName.lastIndexOf(".") + 1;
+							suffixName = mediaName.substring(index);
+						}
+						attachment += "<content>"+url+"</content><type>"+suffixName+"</type><fileName>"+mediaName+"</fileName></item>";
+					}
 				}
 				attachment +="</attachment>";
 				return attachment;
@@ -237,7 +261,7 @@ public class ClientManagerImpl implements ClientManager {
 		String[] fileName = {"111.jpg","555.jpg"};
 		for(int i=0;i < 2;i ++){
 			File file = new File(filePath[i]);
-			if(null != file && file.exists()){
+			if(file != null && file.exists()){
 				attachment +="<item>";
 				FileInputStream in = null;
 				ByteArrayOutputStream baos = null;
@@ -310,13 +334,13 @@ public class ClientManagerImpl implements ClientManager {
 		}catch(IOException e1){
 			e1.printStackTrace();
 		}finally{
-			if(null != ps ){
+			if(ps != null ){
 				try {
 					ps.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}finally{
-					if(null != conn){
+					if(conn != null){
 						try {
 							conn.close();
 						} catch (SQLException e) {
@@ -334,7 +358,7 @@ public class ClientManagerImpl implements ClientManager {
 							+ " or rolepartid = ( select roleid from dlsys.tchumanrole where humanid=" + SysConfig.MIS_REC_AUTOASSIGN_HUMANID + ") )"
 							+ " and recid not in ( select recid from dlmis.torecdispatch )";
 		List<Integer> recs = (List<Integer>)jdbcTemplate.query(sSql, new DAORowMapper<Integer>(Integer.class));
-		if(null == recs || recs.size() < 1) {
+		if(recs == null || recs.size() < 1) {
 			return;
 		}
 		String recIDs = String.valueOf(recs.get(0));

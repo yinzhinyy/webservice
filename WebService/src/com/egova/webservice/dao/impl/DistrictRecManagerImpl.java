@@ -57,25 +57,34 @@ public class DistrictRecManagerImpl implements DistrictRecManager {
 		String transOpinion = request.getTransOpinion();
 		ResultInfo result = new ResultInfo(false);
 		try {
-			//获取当前处理部门下人员
-			String hSql = "SELECT a.humanid FROM dlsys.tchuman a, dlsys.tcunit b WHERE a.unitid=b.unitid"
+			//获取当前处理岗位ID
+			String rSql = "SELECT a.roleid FROM dlsys.tcrole a, dlsys.tcunit b WHERE a.unitid=b.unitid"
 					+ " AND ( b.unitid=66 OR b.seniorid=66 OR b.seniorid IN ( SELECT unitid FROM dlsys.tcunit WHERE seniorid=66))"
-					+ " AND b.unitname = ? AND ROWNUM=1";//66为雨花区专业部门
-			int humanID = jdbcTemplate.queryForInt(hSql, departmentName);
-			//获取当前活动的actID
-			String aSql = "select actid from (select t.actid from dlmis.torecact t where t.actdefid = 57 and t.recid = ?  order by t.createtime desc) where rownum = 1";
-			int actID = jdbcTemplate.queryForInt(aSql, recID);//57为雨花区专业部门actdefID
-			if(actID > 0){
-				//获取当前处理部门ID，并于RECACT更新
-				String rSql = "select roleid from dlsys.tcrole where rolename=?";
-				int roleID = jdbcTemplate.queryForInt(rSql, departmentName);
-				if(roleID > 0 && humanID >0) {
+					+ " AND b.unitname = ?  AND ROWNUM=1";//66为雨花区专业部门
+			int roleID = jdbcTemplate.queryForInt(rSql, departmentName);
+			//获取当前处理部门下人员（任选其一）
+			String hSql = "select a.humanid from dlsys.tchuman a, dlsys.tchumanrole b WHERE a.humanid=b.humanid AND b.roleid = ? and rownum = 1";
+			int humanID = jdbcTemplate.queryForInt(hSql, roleID);
+			if(roleID > 0 && humanID >0) {
+				//更新处置部门
+				//更新torec表
+				String dSql = "UPDATE dlmis.torec t  SET t.funcpartid = ?, t.funcpartname = ?'' WHERE recid = ?";
+				jdbcTemplate.update(dSql, roleID, departmentName, recID);
+				//更新towfactinst表
+				dSql = "UPDATE dlmis.towfactinst t SET t.rolepartid=?, t.rolepartname=? WHERE actid = ( select max(actid) from dlmis.towfactinst where recid=? and actdefid=57 )";
+				jdbcTemplate.update(dSql, roleID, departmentName, recID);
+				//更新towftransinst表
+				dSql = "UPDATE dlmis.towftransinst t SET t.nextrolepartid=? WHERE t.actid = ( SELECT MAX(actid) FROM dlmis.towftransinst WHERE recid=? AND nextactdefid=57)";
+				jdbcTemplate.update(dSql, roleID, recID);
+				//获取当前活动的actID
+				String aSql = "select actid from (select t.actid from dlmis.torecact t where t.actdefid = 57 and t.recid = ?  order by t.createtime desc) where rownum = 1";
+				int actID = jdbcTemplate.queryForInt(aSql, recID);//57为雨花区专业部门actdefID
+				if(actID > 0){
+					//更新torecact表
 					String uSql = "UPDATE dlmis.torecact SET partid=0, rolepartid=?, rolepartname=?, transopinion=? where actid=?";
 					jdbcTemplate.update(uSql, roleID, departmentName, transOpinion, actID);
-				} else {
-					humanID = SysConfig.MIS_REC_AUTOASSIGN_HUMANID;
+					result = this.doAssign(humanID, actID, "assign"); 
 				}
-				result = this.doAssign(humanID, actID, "assign"); 
 			}
 		} catch (Exception e) {
 			result.setMessage("案卷办理失败！");
