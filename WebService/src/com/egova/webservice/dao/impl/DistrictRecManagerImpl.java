@@ -55,7 +55,7 @@ public class DistrictRecManagerImpl implements DistrictRecManager {
 		int recID = request.getRecID();
 		String departmentName = request.getDepartmentName();
 		String transOpinion = request.getTransOpinion();
-		ResultInfo result = new ResultInfo(false);
+		ResultInfo result = new ResultInfo(true);
 		try {
 			//获取当前处理岗位ID
 			String rSql = "SELECT a.roleid FROM dlsys.tcrole a, dlsys.tcunit b WHERE a.unitid=b.unitid"
@@ -76,18 +76,24 @@ public class DistrictRecManagerImpl implements DistrictRecManager {
 				//更新towftransinst表
 				dSql = "UPDATE dlmis.towftransinst t SET t.nextrolepartid=? WHERE t.actid = ( SELECT MAX(actid) FROM dlmis.towftransinst WHERE recid=? AND nextactdefid=57)";
 				jdbcTemplate.update(dSql, roleID, recID);
-				//获取当前活动的actID
-				String aSql = "select actid from (select t.actid from dlmis.torecact t where t.actdefid = 57 and t.recid = ?  order by t.createtime desc) where rownum = 1";
-				int actID = jdbcTemplate.queryForInt(aSql, recID);//57为雨花区专业部门actdefID
-				if(actID > 0){
-					//更新torecact表
-					String uSql = "UPDATE dlmis.torecact SET partid=0, rolepartid=?, rolepartname=?, transopinion=? where actid=?";
-					jdbcTemplate.update(uSql, roleID, departmentName, transOpinion, actID);
-					result = this.doAssign(humanID, actID, "assign"); 
+				try {
+					//获取当前活动的actID
+					String aSql = "select actid from (select t.actid from dlmis.torecact t where t.actdefid = 57 and t.recid = ?  order by t.createtime desc) where rownum = 1";
+					int actID = jdbcTemplate.queryForInt(aSql, recID);//57为雨花区专业部门actdefID
+					if(actID > 0){
+						//更新torecact表
+						String uSql = "UPDATE dlmis.torecact SET partid=0, rolepartid=?, rolepartname=?, transopinion=? where actid=?";
+						jdbcTemplate.update(uSql, roleID, departmentName, transOpinion, actID);
+						result = this.doAssign(humanID, actID, "assign"); 
+					}
+				} catch (Exception e) {
+					logger.error(recID + "案件已自动批转");
+					e.printStackTrace();
 				}
 			}
 		} catch (Exception e) {
-			result.setMessage("案卷办理失败！");
+			result.setSuccess(false);
+			result.setMessage("处置部门无法匹配，请确认是否正确！");
 			e.printStackTrace();
 		}
 		return result;

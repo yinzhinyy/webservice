@@ -69,6 +69,7 @@ public class ClientServiceImpl implements ClientService {
 				} catch (Exception e) {
 					logger.error("区级平台接口无法连接！", e);
 					e.printStackTrace();
+					return;
 				}
 				logger.info("responseXML: " + responseXml);
 				FeedbackResponse feedback = XmlParser.convertToJavaBean(responseXml, FeedbackResponse.class);

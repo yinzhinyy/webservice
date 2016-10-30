@@ -229,6 +229,7 @@ public class ClientManagerImpl implements ClientManager {
 				}
 				if(attachList != null) {
 					for(int i = 0,len = attachList.size();i < len ;i++){
+						attachment +="<item>";
 						String relativeUrl = attachList.get(i);
 						String url = virtualDir + "/" + relativeUrl;
 						String mediaName = null;
