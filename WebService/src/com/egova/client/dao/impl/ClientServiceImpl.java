@@ -83,6 +83,10 @@ public class ClientServiceImpl implements ClientService {
 					if(result != null) {
 						isSuccess = result.getErrorCode();
 						errorDesc = result.getErrorDesc();
+						if(-1 == isSuccess) {
+							clientManager.updateRecNotDispatched(recID);
+							logger.error("调用区级平台派遣接口，返回错误消息！");
+						}
 					}
 					//保存接口报文
 					clientManager.saveXmlContent(recID, recTypeName, "调用雨花区派遣接口", isSuccess, requestXml, responseXml, errorDesc);

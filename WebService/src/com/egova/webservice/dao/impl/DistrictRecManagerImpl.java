@@ -68,7 +68,7 @@ public class DistrictRecManagerImpl implements DistrictRecManager {
 			if(roleID > 0 && humanID >0) {
 				//更新处置部门
 				//更新torec表
-				String dSql = "UPDATE dlmis.torec t  SET t.funcpartid = ?, t.funcpartname = ?'' WHERE recid = ?";
+				String dSql = "UPDATE dlmis.torec t  SET t.funcpartid = ?, t.funcpartname = ? WHERE recid = ?";
 				jdbcTemplate.update(dSql, roleID, departmentName, recID);
 				//更新towfactinst表
 				dSql = "UPDATE dlmis.towfactinst t SET t.rolepartid=?, t.rolepartname=? WHERE actid = ( select max(actid) from dlmis.towfactinst where recid=? and actdefid=57 )";
