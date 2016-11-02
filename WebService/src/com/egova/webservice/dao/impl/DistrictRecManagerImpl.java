@@ -87,7 +87,7 @@ public class DistrictRecManagerImpl implements DistrictRecManager {
 						result = this.doAssign(humanID, actID, "assign"); 
 					}
 				} catch (Exception e) {
-					logger.error(recID + "案件已自动批转");
+					logger.error(recID + "案件已自动批转！");
 					e.printStackTrace();
 				}
 			}
@@ -113,7 +113,7 @@ public class DistrictRecManagerImpl implements DistrictRecManager {
 	public ResultInfo transit(FeedbackRequest request){
 		int actID = 0;
 		int recID = request.getRecID();
-		ResultInfo result = new ResultInfo(false);
+		ResultInfo result = new ResultInfo(true);
 		try{
 			//获取当前活动的actID
 			String sql = "select actid from (select t.actid from dlmis.torecact t where t.actdefid = 57 and t.recid = ?  order by t.createtime desc) where rownum = 1";
@@ -129,21 +129,23 @@ public class DistrictRecManagerImpl implements DistrictRecManager {
 				result = this.doTransit(wTransit);
 			}
 		}catch(Exception e){
-			result.setMessage("案卷批转失败！");
+			result.setMessage(recID+"案卷已自动批转！");
 			e.printStackTrace();
 		}
 		return result;
 	}
 	
 	private ResultInfo doTransit(WFActTransit wfActTransit){
+		ResultInfo result = new ResultInfo(false);
 		try{
 			FoWFActTransit foWFActTransit = new FoWFActTransit(jdbcTemplate);
-			return foWFActTransit.execute(wfActTransit);
+			result =  foWFActTransit.execute(wfActTransit);
 		}catch(Exception e){
+			result.setMessage("案卷批转存过出错！");
 			logger.error("案卷批转存过出错！", e);
 			e.printStackTrace();
 		}
-		return new ResultInfo(false);
+		return result;
 	}
 	
 	public List<RegionStatEval> staticQuery(Date startTime, Date endTime, int regionID) {

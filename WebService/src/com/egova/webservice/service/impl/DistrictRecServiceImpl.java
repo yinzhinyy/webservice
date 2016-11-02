@@ -98,7 +98,7 @@ public class DistrictRecServiceImpl implements DistrictRecService{
 	}
 
 	private boolean isSspPatrolRec(DispatchRec dRec) {
-		return "市民随手拍".equals(dRec.getRecTypeName()) && dRec.getPatrolName() != null;
+		return "市民随手拍".equals(dRec.getRecTypeName()) && dRec.getPatrolID() !=null && dRec.getPatrolName() != null && dRec.getPatrolName().length() > 0;
 	}
 	
 	private boolean hasDepartmentName(FeedbackRequest request) {
