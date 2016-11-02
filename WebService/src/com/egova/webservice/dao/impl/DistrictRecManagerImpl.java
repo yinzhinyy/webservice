@@ -113,7 +113,7 @@ public class DistrictRecManagerImpl implements DistrictRecManager {
 	public ResultInfo transit(FeedbackRequest request){
 		int actID = 0;
 		int recID = request.getRecID();
-		ResultInfo result = new ResultInfo(true);
+		ResultInfo result = new ResultInfo(false);
 		try{
 			//获取当前活动的actID
 			String sql = "select actid from (select t.actid from dlmis.torecact t where t.actdefid = 57 and t.recid = ?  order by t.createtime desc) where rownum = 1";
@@ -129,7 +129,7 @@ public class DistrictRecManagerImpl implements DistrictRecManager {
 				result = this.doTransit(wTransit);
 			}
 		}catch(Exception e){
-			result.setMessage(recID+"案卷已自动批转！");
+			result.setMessage(recID+"案卷批转失败！");
 			e.printStackTrace();
 		}
 		return result;
