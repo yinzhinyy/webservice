@@ -37,10 +37,17 @@ public class ClientServiceImpl implements ClientService {
 		//获取需要派遣至区级品台的案卷列表
 		Map<Integer,String> xmlMap = clientManager.getDispatchXml();
 		if(xmlMap == null|| xmlMap.size() < 1){
-			logger.info("暂无需下发至雨花区平台的问题！");
+			logger.info("暂无需下发至雨花区平台的问题");
 		} else {
+			long starttime = System.currentTimeMillis();
 			Set<Entry<Integer, String>> entrySet = xmlMap.entrySet();
 			for(Entry<Integer,String> entry : entrySet){
+				long endtime = System.currentTimeMillis();
+				long spendtime = (endtime - starttime)/1000;
+				logger.info("已用时：" + spendtime + "秒");
+				if(spendtime > 240) {
+					return;
+				}
 				int recID = entry.getKey();
 				String responseXml = "";
 				String requestXml = entry.getValue();
@@ -69,7 +76,6 @@ public class ClientServiceImpl implements ClientService {
 				} catch (Exception e) {
 					logger.error("区级平台接口无法连接！", e);
 					e.printStackTrace();
-					return;
 				}
 				logger.info("responseXML: " + responseXml);
 				FeedbackResponse feedback = XmlParser.convertToJavaBean(responseXml, FeedbackResponse.class);
