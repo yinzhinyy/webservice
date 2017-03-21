@@ -1,6 +1,7 @@
 package com.egova.webservice;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
@@ -10,6 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.egova.client.bean.DispatchRec;
 import com.egova.webservice.bean.FeedbackRequest;
 import com.egova.webservice.common.ResultInfo;
 import com.egova.webservice.config.SysConfig;
@@ -27,7 +29,17 @@ public class DistrictRecManagerTest {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	
-	@Test
+	@Test 
+	public void testDispatchRec() {
+		int recID = 2537758;
+		List<DispatchRec> dRecs = manager.getDispatchedRec(recID);
+		for(DispatchRec rec : dRecs) {
+			System.out.print(rec.getPatrolID());
+			System.out.print(rec.getPatrolName().length());
+		}
+	}
+	
+//	@Test
 	public void testTransit() {
 		String xml = getRequestXML();
 		FeedbackRequest request = XmlParser.convertToJavaBean(xml, FeedbackRequest.class);
